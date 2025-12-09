@@ -57,48 +57,39 @@ int main(){
     char killCd[50] = {0};
     sprintf(killCd, "taskkill /f /im %s", browserExe);
     system(killCd);
-    for(int i=0;i<5;i++){
-        strcpy(findCmd, "tasklist | findstr ");
-        strcat(findCmd, browsers[i][0]);
-        if(system(findCmd) == 0){
-            strcpy(browserExe, browsers[i][0]);
-            strcpy(openCmd, "start /min "); // 最小化启动，隐藏加载
-            strcat(openCmd, browsers[i][1]);
-            break;
-        }
-    }
-    if(strlen(browserExe)==0){
-        strcpy(browserExe, "msedge.exe");
-        strcpy(openCmd, "start /min msedge");
-    }
-
-    // 2. 无感知打开5个B站随机UP主（最小化启动+后台加载+瞬间全屏）
-    for(int i=0;i<5;i++){
-        char fullCmd[200] = {0};
-        sprintf(fullCmd, "%s https://space.bilibili.com/%d", openCmd, 10000 + rand()%9989999);
-        system(fullCmd);
-        // 后台加载（用户无感知）
-        // 查找窗口并瞬间全屏显示
-        HWND hBrowserWnd = FindBrowserWindow(browserExe);
-        if(hBrowserWnd) SetWindowFullScreenSilent(hBrowserWnd);
-    }
-
-    // 3. 等待5秒，强制关闭浏览器
-    Sleep(10000);
-    char killCmd[50] = {0};
-    sprintf(killCmd, "taskkill /f /im %s", browserExe);
-    system(killCmd);
-
-    // 4. 无感知重新打开5个全屏UP主
-    Sleep(2000);
-    for(int i=0;i<5;i++){
-        char fullCmd[200] = {0};
-        sprintf(fullCmd, "%s https://space.bilibili.com/%d", openCmd, 10000 + rand()%9989999);
-        system(fullCmd);
-        Sleep(1500);
-        HWND hBrowserWnd = FindBrowserWindow(browserExe);
-        if(hBrowserWnd) SetWindowFullScreenSilent(hBrowserWnd);
-    }
-
+    while(1)
+    {
+	    for(int i=0;i<5;i++){
+	        strcpy(findCmd, "tasklist | findstr ");
+	        strcat(findCmd, browsers[i][0]);
+	        if(system(findCmd) == 0){
+	            strcpy(browserExe, browsers[i][0]);
+	            strcpy(openCmd, "start /min "); // 最小化启动，隐藏加载
+	            strcat(openCmd, browsers[i][1]);
+	            break;
+	        }
+	    }
+	    if(strlen(browserExe)==0){
+	        strcpy(browserExe, "msedge.exe");
+	        strcpy(openCmd, "start /min msedge");
+	    }
+		
+	    // 2. 无感知打开5个B站随机UP主（最小化启动+后台加载+瞬间全屏）
+	    for(int i=0;i<5;i++){
+	        char fullCmd[200] = {0};
+	        sprintf(fullCmd, "%s https://space.bilibili.com/%d", openCmd, 10000 + rand()%9989999);
+	        system(fullCmd);
+	        // 后台加载（用户无感知）
+	        // 查找窗口并瞬间全屏显示
+	        HWND hBrowserWnd = FindBrowserWindow(browserExe);
+	        if(hBrowserWnd) SetWindowFullScreenSilent(hBrowserWnd);
+	    }
+	
+	    // 3. 等待5秒，强制关闭浏览器
+	    Sleep(2000);
+	    char killCmd[50] = {0};
+	    sprintf(killCmd, "taskkill /f /im %s", browserExe);
+	    system(killCmd);
+}
     return 0;
 }
